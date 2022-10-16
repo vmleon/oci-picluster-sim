@@ -1,6 +1,6 @@
 # OCI PiCluster Simulator
 
-## Deployment on OCI
+## Deployment on OCI
 
 ```
 cp deploy/terraform/terraform.tfvars.template deploy/terraform/terraform.tfvars
@@ -12,7 +12,7 @@ Edit `deploy/terraform/terraform.tfvars`.
 ./start.sh
 ```
 
-## Run locally
+## Run locally
 
 ```
 cd generator
