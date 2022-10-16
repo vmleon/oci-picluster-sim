@@ -1,0 +1,8 @@
+[gens]
+%{ for index, hostname in gen_hostnames ~}
+${hostname} ansible_host=${gen_public_ips[index]}
+%{ endfor ~}
+
+[gens:vars]
+ansible_user=opc
+ansible_private_key_file=~/.ssh/id_rsa

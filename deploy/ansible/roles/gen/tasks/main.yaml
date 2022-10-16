@@ -1,0 +1,59 @@
+---
+- name: Install Node
+  dnf:
+    name: "@nodejs:16"
+    update_cache: yes
+- name: Copy files
+  copy:
+    src: "../../../../../generator/{{ item }}"
+    dest: /home/opc/gen/
+    owner: opc
+  with_items:
+    - "src/gen.js"
+    - "package.json"
+    - "package-lock.json"
+- name: Copy env file
+  template:
+    src: ../files/env.j2
+    dest: /home/opc/gen/.env
+    owner: opc
+    group: opc
+    mode: 0640
+- name: Install dependencies
+  command: npm install
+  become: true
+  become_user: opc
+  args:
+    chdir: /home/opc/gen/
+- name: Install pm2
+  command: npm install pm2 -g
+- name: Daemonized pm2
+  command: "pm2 list"
+  become: true
+  become_user: opc
+- name: Register running apps
+  command: "pm2 list --mini-list"
+  become: true
+  become_user: opc
+  register: num_instances
+- name: PRINT DEBUG
+  debug:
+    msg: "{{ num_instances.stdout_lines }}"
+- name: Reload
+  command: pm2 reload --update-env gen
+  become: true
+  become_user: opc
+  when: num_instances.stdout_lines | length > 0
+  environment:
+    NODE_ENV: production
+  args:
+    chdir: /home/opc/gen/
+- name: Run
+  command: pm2 start gen.js -i {{ instances_per_node }}
+  become: true
+  become_user: opc
+  when: num_instances.stdout_lines | length == 0
+  environment:
+    NODE_ENV: production
+  args:
+    chdir: /home/opc/gen/

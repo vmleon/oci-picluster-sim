@@ -1,0 +1,6 @@
+---
+- name: Generator
+  hosts: gens
+  become: true
+  roles:
+    - gen
